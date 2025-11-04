@@ -7,7 +7,7 @@ This document provides detailed information about the BROski API, including avai
 - [Authentication](#authentication)
 - [Base URL](#base-url)
 - [Endpoints](#endpoints)
-  - [Authentication](#authentication-1)
+  - [Authentication Endpoints](#authentication-endpoints)
   - [Users](#users)
   - [Tasks](#tasks)
   - [Rewards](#rewards)
@@ -27,13 +27,13 @@ Authorization: Bearer <your_jwt_token>
 
 ## Base URL
 
-```
+```text
 https://api.broski.app/v1
 ```
 
 ## Endpoints
 
-### Authentication
+### Authentication Endpoints
 
 #### Register a New User
 
@@ -300,7 +300,7 @@ BROski provides real-time updates through WebSockets for features like live task
 
 ### Connection URL
 
-```
+```text
 wss://api.broski.app/v1/ws
 ```
 
@@ -370,7 +370,7 @@ wss://api.broski.app/v1/ws
 
 Rate limit headers are included in responses:
 
-```
+```http
 X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 999
 X-RateLimit-Reset: 3600

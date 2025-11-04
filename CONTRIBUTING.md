@@ -16,12 +16,14 @@ Thank you for your interest in contributing to BROski! We're excited to have you
    - Click the "Fork" button on the top right of the [GitHub repository](https://github.com/your-username/broski-app)
 
 2. **Clone Your Fork**
+
    ```bash
    git clone https://github.com/your-username/broski-app.git
    cd broski-app
    ```
 
 3. **Install Dependencies**
+
    ```bash
    npm install
    # or
@@ -31,12 +33,14 @@ Thank you for your interest in contributing to BROski! We're excited to have you
    ```
 
 4. **Set Up Environment Variables**
+
    ```bash
    cp .env.example .env.local
    # Update the environment variables in .env.local
    ```
 
 5. **Start the Development Server**
+
    ```bash
    npm run dev
    ```
@@ -58,7 +62,7 @@ Example: `feature/add-dark-mode`
 
 We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
 
-```
+```text
 <type>(<scope>): <short summary>
 
 [optional body]
@@ -66,7 +70,8 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 [optional footer(s)]
 ```
 
-Types:
+### Types
+
 - `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation only changes
@@ -77,7 +82,7 @@ Types:
 - `chore`: Changes to the build process or auxiliary tools
 
 Example:
-```
+
 feat(auth): add Google OAuth integration
 
 - Add Google OAuth button component
@@ -85,17 +90,18 @@ feat(auth): add Google OAuth integration
 - Add error handling
 
 Closes #123
-```
 
 ### Pull Request Process
 
 1. Make sure your fork is up to date with the main branch
+
    ```bash
    git checkout main
    git pull upstream main
    ```
 
 2. Create a new branch for your changes
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -103,6 +109,7 @@ Closes #123
 3. Make your changes and commit them with a descriptive commit message
 
 4. Push your changes to your fork
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -173,6 +180,6 @@ We welcome feature requests! Please open an issue with:
 
 Please note that this project is governed by the [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
-## 🙏 Thank You!
+## 🙏 Thank You
 
 Thank you for taking the time to contribute to BROski! Your contributions help make this project better for everyone.

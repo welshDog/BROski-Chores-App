@@ -1,17 +1,16 @@
-<div align="center">
-  <h1>BROski - Gamified Task Management</h1>
-  <p>Transform mundane chores into an engaging gaming experience. Track tasks, earn rewards, and level up your productivity with our 3D interactive platform.</p>
-  
-  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-  [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
-  
-  [Live Demo](#live-demo) | [Documentation](#documentation) | [Features](#-features) | [Tech Stack](#-tech-stack) | [Getting Started](#-getting-started) | [Contributing](#-contributing) | [License](#-license)
-</div>
+# BROski - Gamified Task Management
+
+> Transform mundane chores into an engaging gaming experience. Track tasks, earn rewards, and level up your productivity with our 3D interactive platform.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
+[![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+
+[Live Demo](#-live-demo) • [Documentation](#-documentation) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Contributing](#-contributing) • [License](#-license)
 
 ## 🌟 Live Demo
 
-Check out our live demo: [BROski Demo](https://broski-app.vercel.app/)
+Check out our live demo: [BROski Demo](https://welshDog.github.io/BROski-Chores-App/)
 
 ## 📖 Documentation
 
@@ -105,7 +104,7 @@ Check out our live demo: [BROski Demo](https://broski-app.vercel.app/)
 
 ## 🏗️ Project Structure
 
-```
+```text
 src/
 ├── assets/               # Static assets (images, fonts, etc.)
 ├── components/           # Reusable UI components
@@ -176,8 +175,8 @@ src/
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/your-username/broski-app.git
-   cd broski-app
+   git clone https://github.com/welshDog/BROski-Chores-App.git
+   cd BROski-Chores-App
    ```
 
 2. **Install dependencies**
@@ -213,38 +212,8 @@ src/
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build
-- `npm run test` - Run tests
-- `npm run lint` - Run linter
-- `npm run format` - Format code with Prettier
-
-1. Clone the repository
-
-   ```bash
-   git clone https://github.com/your-username/broski-app.git
-   cd broski-app
-   ```
-
-2. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-3. Start the development server
-
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:5173](http://localhost:5173) in your browser
-
-### Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
 - `npm test` - Run tests
-- `npm run lint` - Run ESLint
+- `npm run lint` - Run linter
 - `npm run format` - Format code with Prettier
 
 ## 🎨 Theming
@@ -253,15 +222,7 @@ BROski uses Tailwind CSS for styling. Customize the theme in `tailwind.config.js
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 🤝 Contributing
-
-Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) to get started.
+Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) to get started.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -278,11 +239,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Three.js](https://threejs.org/) for amazing 3D capabilities
 - [Vite](https://vitejs.dev/) for the awesome developer experience
 - [shadcn/ui](https://ui.shadcn.com/) for beautiful components
-- All the amazing open-source libraries that made this project possible
-
-## 🙏 Acknowledgments
-
-- [Vite](https://vitejs.dev/) for the amazing development experience
-- [Three.js](https://threejs.org/) for 3D rendering
 - [Tailwind CSS](https://tailwindcss.com/) for utility-first CSS
 - All the amazing open-source libraries that made this project possible

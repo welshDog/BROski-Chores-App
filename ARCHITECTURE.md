@@ -52,7 +52,7 @@ export default defineConfig({
 
 ### 3.1 Test Pyramid
 
-```
+```text
         [E2E Tests] (Playwright)
             /
            /  
