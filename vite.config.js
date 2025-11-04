@@ -6,6 +6,7 @@ import { fileURLToPath, URL } from 'node:url';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  base: process.env.NODE_ENV === 'production' ? '/BROski-Chores-App/' : '/',
   plugins: [
     react({
       babel: {
