@@ -1,0 +1,86 @@
+{
+  "name": "broski-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx",
+    "format": "prettier --write .",
+    "prepare": "husky install",
+    "test": "vitest",
+    "test:watch": "vitest watch",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.98.0",
+    "@react-three/fiber": "^8.18.0",
+    "@shadcn/ui": "^0.0.4",
+    "axios": "^1.6.7",
+    "date-fns": "^3.3.1",
+    "firebase": "^10.8.0",
+    "framer-motion": "^10.16.4",
+    "gsap": "^3.12.5",
+    "lucide-react": "^0.331.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.22.1",
+    "three": "^0.160.0",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.7",
+    "@babel/eslint-parser": "^7.23.3",
+    "@babel/plugin-transform-runtime": "^7.23.4",
+    "@babel/preset-react": "^7.23.3",
+    "@tailwindcss/typography": "^0.5.19",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^14.3.1",
+    "@testing-library/user-event": "^14.5.1",
+    "@types/node": "^20.19.24",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@types/three": "^0.160.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.1",
+    "@typescript-eslint/parser": "^6.19.1",
+    "@vitejs/plugin-react": "^4.7.0",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.2",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.5",
+    "husky": "^9.0.11",
+    "identity-obj-proxy": "^3.0.0",
+    "lint-staged": "^15.2.0",
+    "postcss": "^8.4.33",
+    "prettier": "^3.2.4",
+    "rollup-plugin-visualizer": "^6.0.5",
+    "tailwindcss": "^3.4.1",
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "^5.3.3",
+    "vite": "^7.1.12",
+    "vite-plugin-svgr": "^4.2.0",
+    "vitest": "^4.0.6"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ],
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
