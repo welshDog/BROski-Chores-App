@@ -1,0 +1,12 @@
+# HyperFocus Z0ne repo manifest - read by scripts/gen_repo_map.py
+# Edit this file, then re-run the generator. Never hand-edit the map.
+
+name: "BROski-Chores-App"
+emoji: "🧹"
+tagline: "Chores gamified — tasks, rewards, levelling"
+category: "products"
+stack: "Vite + React"
+first_doc: "README.md"
+tier: "PARKED"
+url: ""
+notes: "untouched since Nov 2025 — frozen on purpose"
