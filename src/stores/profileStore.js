@@ -51,7 +51,7 @@ export const useProfileStore = create(
               coins: p.coins + coins,
               xp: newXp,
               level: newLevel,
-              justLeveledUp: newLevel > p.level,
+              justLeveledUp: p.justLeveledUp || newLevel > p.level,
             };
           }),
         }));

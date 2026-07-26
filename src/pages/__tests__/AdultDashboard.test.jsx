@@ -84,4 +84,17 @@ describe('AdultDashboard', () => {
     expect(useChoreStore.getState().templates.some((t) => t.title === 'Take out bins')).toBe(true);
     expect(screen.getByText('Take out bins')).toBeInTheDocument();
   });
+
+  it('a newly added chore template immediately generates today\'s instance, visible without reload', () => {
+    renderDashboard();
+    fireEvent.change(screen.getByLabelText(/chore title/i), { target: { value: 'Take out bins' } });
+    fireEvent.change(screen.getByLabelText(/coins/i), { target: { value: '8' } });
+    fireEvent.change(screen.getByLabelText(/xp/i), { target: { value: '4' } });
+    fireEvent.click(screen.getByRole('button', { name: /add chore/i }));
+
+    const today = new Date().toISOString().slice(0, 10);
+    const newTemplate = useChoreStore.getState().templates.find((t) => t.title === 'Take out bins');
+    const instances = useChoreStore.getState().instancesForDate(today);
+    expect(instances.some((i) => i.templateId === newTemplate.id)).toBe(true);
+  });
 });

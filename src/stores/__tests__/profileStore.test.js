@@ -93,6 +93,16 @@ describe('profileStore', () => {
     expect(updated.justLeveledUp).toBe(false);
   });
 
+  it('addReward does not clobber an unacknowledged level-up from a prior reward that stayed below the next level', () => {
+    const profile = useProfileStore.getState().addProfile({ name: 'Evan', role: 'kid', avatarColor: '#FF6B6B' });
+    useProfileStore.getState().addReward(profile.id, { coins: 5, xp: 105 }); // crosses into level 2, justLeveledUp -> true
+    useProfileStore.getState().addReward(profile.id, { coins: 5, xp: 5 }); // stays in level 2, would naively compute justLeveledUp=false
+
+    const updated = useProfileStore.getState().getProfile(profile.id);
+    expect(updated.level).toBe(2);
+    expect(updated.justLeveledUp).toBe(true); // still true -- the first level-up was never acknowledged
+  });
+
   it('clearLevelUpFlag resets justLeveledUp to false', () => {
     const profile = useProfileStore.getState().addProfile({ name: 'Evan', role: 'kid', avatarColor: '#FF6B6B' });
     useProfileStore.getState().addReward(profile.id, { coins: 5, xp: 150 });

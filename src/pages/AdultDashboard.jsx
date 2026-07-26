@@ -3,17 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { useProfileStore } from '../stores/profileStore';
 import { useChoreStore } from '../stores/choreStore';
 
+const WEEKDAY_ABBREV = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
 export default function AdultDashboard() {
   const navigate = useNavigate();
   const currentProfileId = useProfileStore((state) => state.currentProfileId);
   const profiles = useProfileStore((state) => state.profiles);
   const addReward = useProfileStore((state) => state.addReward);
+  const clearCurrentProfile = useProfileStore((state) => state.clearCurrentProfile);
 
   const templates = useChoreStore((state) => state.templates);
   const instances = useChoreStore((state) => state.instances);
   const addTemplate = useChoreStore((state) => state.addTemplate);
   const approve = useChoreStore((state) => state.approve);
   const decline = useChoreStore((state) => state.decline);
+  const generateTodaysInstances = useChoreStore((state) => state.generateTodaysInstances);
 
   const [title, setTitle] = useState('');
   const [coinReward, setCoinReward] = useState('');
@@ -46,6 +50,8 @@ export default function AdultDashboard() {
       assignedTo: 'anyone',
       schedule: { type: 'daily' },
     });
+    const today = new Date();
+    generateTodaysInstances(today.toISOString().slice(0, 10), WEEKDAY_ABBREV[today.getDay()]);
     setTitle('');
     setCoinReward('');
     setXpReward('');
@@ -55,7 +61,13 @@ export default function AdultDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-6">
       <header className="mb-6 flex items-center justify-between max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-purple-700">Adult dashboard</h1>
-        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline">
+        <button
+          onClick={() => {
+            clearCurrentProfile();
+            navigate('/');
+          }}
+          className="text-sm text-gray-500 underline"
+        >
           Switch profile
         </button>
       </header>

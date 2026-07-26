@@ -14,6 +14,7 @@ export default function KidChoreBoard() {
   const navigate = useNavigate();
   const currentProfileId = useProfileStore((state) => state.currentProfileId);
   const profile = useProfileStore((state) => state.getProfile(currentProfileId));
+  const clearCurrentProfile = useProfileStore((state) => state.clearCurrentProfile);
   const instances = useChoreStore((state) => state.instances);
   const templates = useChoreStore((state) => state.templates);
   const markDone = useChoreStore((state) => state.markDone);
@@ -40,7 +41,13 @@ export default function KidChoreBoard() {
             {profile.coins} coins · Level {profile.level}
           </p>
         </div>
-        <button onClick={() => navigate('/')} className="text-sm text-gray-500 underline">
+        <button
+          onClick={() => {
+            clearCurrentProfile();
+            navigate('/');
+          }}
+          className="text-sm text-gray-500 underline"
+        >
           Switch profile
         </button>
       </header>
