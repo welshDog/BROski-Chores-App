@@ -1,16 +1,32 @@
-﻿import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
-import { useGameStore } from '../../stores/gameStore';
+import { useFrame } from '@react-three/fiber';
+import { useRef, useState } from 'react';
+import { useProfileStore } from '../../stores/profileStore';
+import { pulseScale } from '../../lib/avatarAnimation';
 
-export default function Avatar() {
+const LEVEL_UP_DURATION_MS = 1500;
+
+export default function Avatar({ profileId }) {
   const avatarRef = useRef();
-  const { position } = useGameStore();
+  const avatarColor = useProfileStore((state) => state.getProfile(profileId)?.avatarColor ?? '#FF6B6B');
+  const justLeveledUp = useProfileStore((state) => state.getProfile(profileId)?.justLeveledUp ?? false);
+  const clearLevelUpFlag = useProfileStore((state) => state.clearLevelUpFlag);
+  const [elapsed, setElapsed] = useState(0);
 
-  useFrame(() => {
-    // Animate avatar movement
-    if (avatarRef.current) {
-      // Simple animation - in a real app, you'd use GSAP or similar
-      avatarRef.current.position.x = position * 0.5; // Adjust multiplier as needed
+  useFrame((_, delta) => {
+    if (!avatarRef.current) return;
+
+    if (justLeveledUp) {
+      const nextElapsed = elapsed + delta * 1000;
+      const scale = pulseScale(nextElapsed, LEVEL_UP_DURATION_MS);
+      avatarRef.current.scale.setScalar(scale);
+      if (nextElapsed >= LEVEL_UP_DURATION_MS) {
+        setElapsed(0);
+        clearLevelUpFlag(profileId);
+      } else {
+        setElapsed(nextElapsed);
+      }
+    } else {
+      avatarRef.current.scale.setScalar(1);
     }
   });
 
@@ -18,7 +34,7 @@ export default function Avatar() {
     <group ref={avatarRef}>
       <mesh position={[0, 0.5, 0]}>
         <boxGeometry args={[0.8, 1, 0.4]} />
-        <meshStandardMaterial color="#FF6B6B" />
+        <meshStandardMaterial color={avatarColor} />
       </mesh>
     </group>
   );
