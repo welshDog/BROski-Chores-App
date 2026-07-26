@@ -96,5 +96,9 @@ describe('ProfilePicker', () => {
 
     expect(screen.getByText('Evan')).toBeInTheDocument();
     expect(screen.getByText('Bro')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Bro'));
+    for (const digit of '1234') fireEvent.click(screen.getByRole('button', { name: digit }));
+    expect(mockNavigate).toHaveBeenCalledWith('/adult');
   });
 });

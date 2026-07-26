@@ -15,7 +15,7 @@ BROski Chores runs on one shared device — a tablet on the fridge, a laptop in 
 
 Kids complete chores for coins and XP; an adult approves before the reward lands, so the economy can't be self-awarded. Approved rewards level up the kid's 3D avatar, which visibly pulses on level-up — that's the whole payoff loop.
 
-There is **no backend, no login system, no account creation**. Everything lives in the browser's `localStorage`. The first profiles are created once via the browser console (see [Seeding your first profiles](#seeding-your-first-profiles)) — there's no in-app "add person" screen yet (see [Known gaps](#known-gaps-v11)).
+There is **no backend, no login system, no account creation**. Everything lives in the browser's `localStorage`. On first launch, when no profiles exist yet, the app shows a setup wizard that walks through adding the kids, one adult with a PIN, and an optional first chore — no console needed. Seeding profiles via the browser console (see [Seeding profiles from the console (optional)](#seeding-profiles-from-the-console-optional)) is still available as an alternative, e.g. for adding more profiles later.
 
 ## Design history
 
@@ -96,9 +96,9 @@ npm run dev
 
 The app opens at `http://localhost:5273`. No environment variables are needed — there's nothing to configure.
 
-### Seeding your first profiles
+### Seeding profiles from the console (optional)
 
-There's no in-app way to create a profile in this v1 (see [Known gaps](#known-gaps-v11)). Open the browser console and run:
+The in-app setup wizard now handles first-launch profile creation automatically — when the app opens with no profiles, it walks you through adding kids, one adult with a PIN, and an optional first chore. The console commands below are an alternative, useful for adding more profiles after the fact. Open the browser console and run:
 
 ```js
 useProfileStore.getState().addProfile({ name: 'Evan', role: 'kid', avatarColor: '#FF6B6B' })
@@ -120,7 +120,7 @@ Reload the page and both profiles will appear on the picker.
 
 These are named, deliberate deferrals, not bugs:
 
-- **No in-app profile creation.** Households seed the first profiles via the browser console (above). An adult profile created with no PIN would be permanently un-enterable — always set one.
+- **In-app setup is wizard-only for the very first household setup.** The wizard covers kids + one adult + an optional first chore, and it always requires a PIN for the adult. The console-seeding path (still available for adding profiles after the fact) does not enforce one — an adult profile created via console with no PIN is permanently un-enterable, so always set one.
 - No shared BROski$ economy integration — coins/XP are local to this app by design.
 
 ## Contributing

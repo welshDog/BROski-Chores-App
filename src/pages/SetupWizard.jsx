@@ -25,8 +25,8 @@ export default function SetupWizard() {
   const [pinError, setPinError] = useState(false);
 
   function addDraftKid() {
-    if (!kidName || !kidColor) return;
-    setDraftKids((prev) => [...prev, { draftId: crypto.randomUUID(), name: kidName, avatarColor: kidColor }]);
+    if (!kidName.trim() || !kidColor) return;
+    setDraftKids((prev) => [...prev, { draftId: crypto.randomUUID(), name: kidName.trim(), avatarColor: kidColor }]);
     setKidName('');
     setKidColor('');
   }
@@ -36,7 +36,7 @@ export default function SetupWizard() {
   }
 
   function continueFromAdultName() {
-    if (!adultName || !adultColor) return;
+    if (!adultName.trim() || !adultColor) return;
     setStep('adult-pin');
   }
 
@@ -65,13 +65,15 @@ export default function SetupWizard() {
   // the (optional) chore, so a kid-specific chore assignment can resolve
   // through a real profile id, never a draft-local one.
   function handleFinish(chorePatch) {
+    if (!confirmedPin) return;
+
     const idMap = {};
     draftKids.forEach((kid) => {
       const created = addProfile({ name: kid.name, role: 'kid', avatarColor: kid.avatarColor });
       idMap[kid.draftId] = created.id;
     });
 
-    addProfile({ name: adultName, role: 'adult', pin: confirmedPin, avatarColor: adultColor });
+    addProfile({ name: adultName.trim(), role: 'adult', pin: confirmedPin, avatarColor: adultColor });
 
     if (chorePatch) {
       const resolvedAssignedTo = chorePatch.assignedTo === 'anyone' ? 'anyone' : idMap[chorePatch.assignedTo];
@@ -117,7 +119,8 @@ export default function SetupWizard() {
           <AvatarColorSwatches value={kidColor} onChange={setKidColor} />
           <button
             onClick={addDraftKid}
-            className="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 transition-colors"
+            disabled={!kidName || !kidColor}
+            className="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Add kid
           </button>
@@ -195,11 +198,21 @@ export default function SetupWizard() {
         <h2 className="text-xl font-semibold text-gray-800">Confirm PIN</h2>
         {pinError && <p className="text-red-600 text-sm">PINs didn't match, try again.</p>}
         <PinPad onSubmit={handleConfirmPin} />
+        <button
+          onClick={() => {
+            setPendingPin(null);
+            setPinError(false);
+            setStep('adult-pin');
+          }}
+          className="text-sm text-gray-500 underline"
+        >
+          Set a different PIN
+        </button>
       </div>
     );
   }
 
-  return (
+  if (step === 'chore') return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-gradient-to-br from-blue-50 to-purple-50 p-6">
       <h2 className="text-2xl font-bold text-purple-700">Add your first chore?</h2>
       <div className="w-full max-w-sm bg-white rounded-xl shadow-md p-6">
@@ -216,4 +229,6 @@ export default function SetupWizard() {
       </button>
     </div>
   );
+
+  return null;
 }
