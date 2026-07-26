@@ -1,243 +1,133 @@
-# BROski - Gamified Task Management
+# BROski Chores
 
-> Transform mundane chores into an engaging gaming experience. Track tasks, earn rewards, and level up your productivity with our 3D interactive platform.
+> A household chores app for one shared device — pick your profile, complete chores, get approved, level up your 3D avatar.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
 
-[Live Demo](#-live-demo) • [Documentation](#-documentation) • [Features](#-features) • [Tech Stack](#-tech-stack) • [Getting Started](#-getting-started) • [Contributing](#-contributing) • [License](#-license)
+## What is this?
 
-## 🌟 Live Demo
+BROski Chores runs on one shared device — a tablet on the fridge, a laptop in the kitchen. Household members tap their own profile:
 
-Check out our live demo: [BROski Demo](https://welshDog.github.io/BROski-Chores-App/)
+- **Kids** go straight to their chore board — no login, just a tap.
+- **Adults** are behind a short PIN (a household speed bump, not real security) and land on an approval dashboard.
 
-## 📖 Documentation
+Kids complete chores for coins and XP; an adult approves before the reward lands, so the economy can't be self-awarded. Approved rewards level up the kid's 3D avatar, which visibly pulses on level-up — that's the whole payoff loop.
 
-- [Architecture](ARCHITECTURE.md) - Project structure and architecture
-- [API Documentation](API_DOCS.md) - API endpoints and usage
-- [Deployment Guide](DEPLOYMENT.md) - How to deploy the application
-- [Contribution Guide](CONTRIBUTING.md) - How to contribute to the project
+There is **no backend, no login system, no account creation**. Everything lives in the browser's `localStorage`. The first profiles are created once via the browser console (see [Seeding your first profiles](#seeding-your-first-profiles)) — there's no in-app "add person" screen yet (see [Known gaps](#known-gaps-v11)).
 
-## ✨ Features
+## Design history
 
-### 🎮 Interactive 3D Avatar System
+This app was rebuilt from scratch on 2026-07-26. The full reasoning — why one shared device instead of per-person logins, why chores are recurring templates instead of one-off tasks, why approval is required — is written up in:
 
-- Customizable 3D avatars
-- Real-time animations
-- Achievement-based unlocks
+- [`docs/superpowers/specs/2026-07-26-household-chores-v1-design.md`](docs/superpowers/specs/2026-07-26-household-chores-v1-design.md) — the design spec
+- [`docs/superpowers/plans/2026-07-26-household-chores-v1.md`](docs/superpowers/plans/2026-07-26-household-chores-v1.md) — the task-by-task implementation plan
 
-### 📝 Task Management
+## Features
 
-- Create, update, and complete tasks
-- Categorize tasks by type and priority
-- Set due dates and reminders
+### Profile picker
+A grid of avatar tiles. Kids tap through instantly; adults enter a PIN first.
 
-### 🏆 Progression System
+### Recurring chores
+Chores are defined once as templates (title, coin/XP reward, who it's for, how often) and the app generates today's instances automatically — daily, or on specific weekdays.
 
-- Earn XP for completing tasks
-- Level up your avatar
-- Unlock achievements and rewards
+### Approval flow
+A kid marking a chore "Done" moves it to `pending`, not straight to `approved`. An adult reviews the queue and approves or declines. Declined chores go back to `open` — nothing is ever deleted.
 
-### 💰 Economy System
+### Per-profile economy
+Each profile has its own coins, XP, and level, credited only on approval.
 
-- Earn coins for completing tasks
-- Spend coins on avatar customizations
-- Daily rewards and bonuses
+### 3D avatar reward
+A React Three Fiber avatar renders on the kid's board and pulses visibly when a reward crosses a level threshold.
 
-### 📊 Analytics Dashboard
+## Tech Stack
 
-- Track your productivity
-- View progress over time
-- Set and achieve goals
+| Layer | Choice |
+|---|---|
+| Frontend | React 18 + Vite |
+| Routing | React Router v6 (three routes: `/`, `/kid`, `/adult`) |
+| State | Zustand, with the `persist` middleware backing `profileStore` and `choreStore` to `localStorage` |
+| 3D | `@react-three/fiber` + `@react-three/drei` + `three` |
+| Styling | Tailwind CSS |
+| Testing | Vitest + React Testing Library |
 
-### 🎨 User Experience
+No backend, no database, no auth service, no Firebase, no REST/WebSocket API. If you're looking for any of those in this repo, they aren't here — an earlier scaffold described them, but they were never built and have been removed.
 
-- Modern, responsive design
-- Dark/light mode
-- Keyboard shortcuts
-- Offline support
-
-## 🚀 Tech Stack
-
-### Frontend
-
-- **Framework**: [React 18](https://reactjs.org/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **3D Rendering**:
-  - [Three.js](https://threejs.org/)
-  - [@react-three/fiber](https://github.com/pmndrs/react-three-fiber)
-  - [@react-three/drei](https://github.com/pmndrs/drei)
-
-### State Management
-
-- [Zustand](https://github.com/pmndrs/zustand) - Lightweight state management
-- [React Query](https://tanstack.com/query) - Server state management
-
-### Styling & UI
-
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS framework
-- [Framer Motion](https://www.framer.com/motion/) - Animation library
-- [shadcn/ui](https://ui.shadcn.com/) - Reusable UI components
-
-### Routing & Navigation
-
-- [React Router v6](https://reactrouter.com/) - Client-side routing
-
-### Form Handling
-
-- [React Hook Form](https://react-hook-form.com/) - Form validation
-- [Zod](https://zod.dev/) - Schema validation
-
-### Testing
-
-- [Vitest](https://vitest.dev/) - Test runner
-- [React Testing Library](https://testing-library.com/) - Component testing
-- [MSW](https://mswjs.io/) - API mocking
-
-### Code Quality
-
-- [ESLint](https://eslint.org/) - JavaScript linter
-- [Prettier](https://prettier.io/) - Code formatter
-- [Husky](https://typicode.github.io/husky/) - Git hooks
-- [Commitlint](https://commitlint.js.org/) - Commit message linter
-
-## 🏗️ Project Structure
+## Project Structure
 
 ```text
 src/
-├── assets/               # Static assets (images, fonts, etc.)
-├── components/           # Reusable UI components
-│   ├── ui/              # shadcn/ui components
-│   ├── features/        # Feature-specific components
-│   ├── layout/          # Layout components
-│   └── 3d/              # 3D components and assets
-│
-├── config/              # Application configuration
-│   ├── routes.ts        # Route configurations
-│   └── theme.ts         # Theme configurations
-│
-├── features/            # Feature modules
-│   ├── auth/           # Authentication
-│   ├── tasks/          # Task management
-│   ├── profile/        # User profile
-│   └── rewards/        # Rewards system
-│
-├── hooks/               # Custom React hooks
-│   ├── useAuth.ts      # Authentication hook
-│   └── useTasks.ts     # Tasks hook
-│
-├── lib/                 # Third-party library configurations
-│   ├── api/            # API client
-│   └── firebase/       # Firebase configuration
-│
-├── pages/               # Page components
-│   ├── Home.tsx
-│   ├── Dashboard.tsx
-│   └── Settings.tsx
-│
-├── services/            # API and external services
-│   ├── api.ts          # API service
-│   └── auth.ts         # Auth service
-│
-├── stores/              # State management
-│   ├── auth.store.ts   # Auth store
-│   └── tasks.store.ts  # Tasks store
-│
-├── styles/             # Global styles
-│   ├── globals.css
-│   └── theme.css
-│
-├── types/              # TypeScript type definitions
-│   ├── index.d.ts
-│   └── api.types.ts
-│
-├── utils/              # Utility functions
-│   ├── helpers.ts
-│   └── validators.ts
-│
-└── __tests__/          # Test files
-    ├── components/
-    ├── hooks/
-    └── utils/
+├── stores/
+│   ├── profileStore.js     # profiles, coins/xp/level, PIN check, level-up flag
+│   ├── choreStore.js       # chore templates, daily instance generation, approval lifecycle
+│   └── uiStore.js          # generic notification/modal state
+├── pages/
+│   ├── ProfilePicker.jsx   # entry screen — profile grid + adult PIN gate
+│   ├── KidChoreBoard.jsx   # a kid's chores + their 3D avatar
+│   └── AdultDashboard.jsx  # approval queue + add-a-chore form
+├── components/
+│   ├── PinPad.jsx          # numeric PIN entry
+│   └── 3D/Avatar.jsx       # the reward-payoff avatar, pulses on level-up
+├── lib/
+│   ├── storage.js          # small localStorage read/write helper
+│   └── avatarAnimation.js  # pure level-up pulse curve (no DOM/Three.js)
+├── App.jsx                 # routes + generates today's chore instances on mount
+└── main.jsx
 ```
 
-## 🚀 Getting Started
+Every file above has a matching test in a sibling `__tests__/` directory.
+
+## Getting Started
 
 ### Prerequisites
 
-- Node.js 18+ (LTS version recommended)
-- npm 9+ or pnpm 8+ or yarn 1.22+
-- Git
+- Node.js 18+
+- npm 9+ (or pnpm/yarn)
 
 ### Installation
 
-1. **Clone the repository**
+```bash
+git clone https://github.com/welshDog/BROski-Chores-App.git
+cd BROski-Chores-App
+npm install
+npm run dev
+```
 
-   ```bash
-   git clone https://github.com/welshDog/BROski-Chores-App.git
-   cd BROski-Chores-App
-   ```
+The app opens at `http://localhost:3000`. No environment variables are needed — there's nothing to configure.
 
-2. **Install dependencies**
+### Seeding your first profiles
 
-   ```bash
-   # Using npm
-   npm install
+There's no in-app way to create a profile in this v1 (see [Known gaps](#known-gaps-v11)). Open the browser console and run:
 
-   # Using pnpm
-   pnpm install
+```js
+useProfileStore.getState().addProfile({ name: 'Evan', role: 'kid', avatarColor: '#FF6B6B' })
+useProfileStore.getState().addProfile({ name: 'Bro', role: 'adult', pin: '1234', avatarColor: '#4A90D9' })
+useChoreStore.getState().addTemplate({ title: 'Feed the dog', coinReward: 10, xpReward: 60, assignedTo: 'anyone', schedule: { type: 'daily' } })
+```
 
-   # Using yarn
-   yarn
-   ```
-
-3. **Set up environment variables**
-
-   ```bash
-   cp .env.example .env.local
-   # Update the environment variables in .env.local
-   ```
-
-4. **Start the development server**
-
-   ```bash
-   npm run dev
-   ```
-
-   The app will be available at `http://localhost:3000`
+Reload the page and both profiles will appear on the picker.
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm test` - Run tests
-- `npm run lint` - Run linter
-- `npm run format` - Format code with Prettier
+- `npm run dev` — start the dev server
+- `npm run build` — production build to `dist/`
+- `npm run preview` — preview the production build locally
+- `npm test` — run the test suite (Vitest)
+- `npm run lint` — run ESLint
 
-## 🎨 Theming
+## Known gaps (v1.1)
 
-BROski uses Tailwind CSS for styling. Customize the theme in `tailwind.config.js`.
+These are named, deliberate deferrals, not bugs:
 
-## 🤝 Contributing
+- **No in-app profile creation.** Households seed the first profiles via the browser console (above). An adult profile created with no PIN would be permanently un-enterable — always set one.
+- **Chore templates can only be added, not edited, deactivated, assigned to a specific person, or scheduled on specific weekdays** through the UI. That logic exists in `choreStore.js` and is fully tested — it just has no form wired to it yet.
+- No shared BROski$ economy integration — coins/XP are local to this app by design.
 
-Contributions are welcome! Please read our [Contributing Guide](./CONTRIBUTING.md) to get started.
+## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Contributions are welcome! Please read [CONTRIBUTING.md](./CONTRIBUTING.md) to get started.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [Three.js](https://threejs.org/) for amazing 3D capabilities
-- [Vite](https://vitejs.dev/) for the awesome developer experience
-- [shadcn/ui](https://ui.shadcn.com/) for beautiful components
-- [Tailwind CSS](https://tailwindcss.com/) for utility-first CSS
-- All the amazing open-source libraries that made this project possible

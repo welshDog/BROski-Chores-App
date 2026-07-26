@@ -8,18 +8,18 @@ Thank you for your interest in contributing to BROski! We're excited to have you
 
 - Node.js 18+ and npm 9+ or pnpm 8+ or yarn 1.22+
 - Git
-- Basic understanding of React and TypeScript
+- Basic understanding of React (this is a plain JS/JSX codebase, not TypeScript — `typescript` is a devDependency only for editor tooling on `@types/*` packages)
 
 ### Setting Up the Development Environment
 
 1. **Fork the Repository**
-   - Click the "Fork" button on the top right of the [GitHub repository](https://github.com/your-username/broski-app)
+   - Click the "Fork" button on the top right of the [GitHub repository](https://github.com/welshDog/BROski-Chores-App)
 
 2. **Clone Your Fork**
 
    ```bash
-   git clone https://github.com/your-username/broski-app.git
-   cd broski-app
+   git clone https://github.com/YOUR-USERNAME/BROski-Chores-App.git
+   cd BROski-Chores-App
    ```
 
 3. **Install Dependencies**
@@ -32,18 +32,13 @@ Thank you for your interest in contributing to BROski! We're excited to have you
    yarn
    ```
 
-4. **Set Up Environment Variables**
-
-   ```bash
-   cp .env.example .env.local
-   # Update the environment variables in .env.local
-   ```
-
-5. **Start the Development Server**
+4. **Start the Development Server**
 
    ```bash
    npm run dev
    ```
+
+   No environment variables are needed — this app has no backend to configure.
 
 ## 🛠 Development Workflow
 
@@ -137,9 +132,10 @@ npm test:coverage
 
 ### Writing Tests
 
-- Place test files next to the component/utility they test with a `.test.tsx` or `.test.ts` extension
+- Place tests in a sibling `__tests__/` directory next to the file they test, as `.test.js` or `.test.jsx` (this repo's actual convention — not `.test.ts`/`.test.tsx`, since it's a JS/JSX codebase)
 - Follow the "Arrange-Act-Assert" pattern
 - Mock external dependencies when necessary
+- Prefer extracting pure logic into small, DOM-free functions (see `src/lib/avatarAnimation.js`'s `pulseScale`) so it can be tested without rendering anything
 
 ## 🎨 Styling
 
@@ -175,10 +171,6 @@ We welcome feature requests! Please open an issue with:
 2. A detailed description of the feature
 3. The problem it solves
 4. Any relevant examples or references
-
-## 📜 Code of Conduct
-
-Please note that this project is governed by the [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
 
 ## 🙏 Thank You
 

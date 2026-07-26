@@ -1,198 +1,66 @@
-# BROski Architecture Deep Dive
+# BROski Chores — Architecture
 
-## 1. System Integration Points
+This describes what's actually built. For *why* it's shaped this way, see the design spec at
+[`docs/superpowers/specs/2026-07-26-household-chores-v1-design.md`](docs/superpowers/specs/2026-07-26-household-chores-v1-design.md).
 
-### 1.1 Component Interaction
+## 1. System shape
+
+There is no backend. Everything below runs entirely in the browser.
 
 ```mermaid
 graph TD
-    A[UI Components] -->|Dispatch Actions| B[Zustand Store]
-    B -->|State Updates| A
-    A -->|Render| C[3D Canvas]
-    C -->|User Interactions| B
-    B -->|Animation State| C
+    A[ProfilePicker] -->|selectProfile / verifyPin| P[profileStore]
+    B[KidChoreBoard] -->|markDone| C[choreStore]
+    B -->|reads profile, renders| D[Avatar 3D]
+    E[AdultDashboard] -->|approve / decline| C
+    E -->|addReward, fed from choreStore.approve's return value| P
+    P -->|persist middleware| L[(localStorage)]
+    C -->|persist middleware| L
 ```
 
-### 1.2 Data Flow for Task Completion
+**The one deliberate coupling rule:** `profileStore` and `choreStore` never import each other. `AdultDashboard.jsx` is the sole bridge — it calls `choreStore.approve(instanceId)`, which returns `{ profileId, coinReward, xpReward } | null` as plain data, and only then calls `profileStore.addReward(...)` with that data. Neither store has any awareness the other exists.
 
-1. User clicks "Complete Task" button
-2. UI dispatches `completeTask` action with task ID
-3. Zustand store updates task status and calculates rewards
-4. 3D Avatar receives updated state and triggers celebration animation
-5. UI reflects new coin balance and XP
+## 2. Data flow: completing a chore
 
-## 2. Performance Optimizations
+1. `App.jsx` generates today's `ChoreInstance`s from active `ChoreTemplate`s once on mount (idempotent — safe even if called again, e.g. by React StrictMode's double-invoke in dev).
+2. A kid taps "Done" on `KidChoreBoard` → `choreStore.markDone(instanceId, profileId)` → instance status `open → pending`.
+3. An adult opens `AdultDashboard`, sees the instance in the approval queue, taps Approve → `choreStore.approve(instanceId)` flips status to `approved` and returns the reward → `profileStore.addReward(profileId, { coins, xp })` credits it and recomputes level.
+4. If the reward crosses a level threshold, `addReward` sets `justLeveledUp: true` on that profile.
+5. Next time that kid's board mounts, `Avatar.jsx` sees `justLeveledUp === true`, plays a pulse animation (curve computed by the pure `pulseScale()` function in `src/lib/avatarAnimation.js`, no DOM/Three.js dependency — fully unit-testable), then calls `clearLevelUpFlag`.
 
-### 2.1 Build Optimizations (Vite)
+## 3. State ownership
 
-```javascript
-// vite.config.js
-export default defineConfig({
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          react: ['react', 'react-dom', 'react-router-dom'],
-          three: ['three', '@react-three/fiber', '@react-three/drei']
-        }
-      }
-    }
-  }
-});
-```
+| Store | Owns | Persisted under |
+|---|---|---|
+| `profileStore` | Profiles, PINs, coins/xp/level, `justLeveledUp` | `broski_chores_profiles_v1` (Zustand `persist`) |
+| `choreStore` | Templates, daily instances, lifecycle status | `broski_chores_chores_v1` (Zustand `persist`) |
+| `uiStore` | Generic notifications/modal state | not persisted |
 
-### 2.2 3D Performance
+`src/lib/storage.js` is a small standalone `localStorage` read/write helper, kept for any future code that needs manual persistence outside a Zustand store — neither current store uses it, since `persist` already handles that lifecycle correctly for them.
 
-- **Lazy Loading**: 3D assets are loaded on-demand
-- **Level of Detail (LOD)**: Different quality models based on device capability
-- **Frustum Culling**: Only render objects in view
-- **Instanced Meshes**: For repeated objects like coins or collectibles
+## 4. Routing
 
-## 3. Testing Strategy
+Three routes via React Router v6, all defined in `App.jsx`:
 
-### 3.1 Test Pyramid
+- `/` — `ProfilePicker`
+- `/kid` — `KidChoreBoard`
+- `/adult` — `AdultDashboard`
 
-```text
-        [E2E Tests] (Playwright)
-            /
-           /  
-[Integration Tests]  
-  (React Testing Library)
-         |
-         |
- [Unit Tests]  
-  (Vitest + Jest)
-```
+`AdultDashboard`'s route guard checks that the *currently selected profile's role* is `'adult'` (not just that some profile is selected) — this closes a real bug found during a whole-branch review, where a kid picking their own profile could still reach `/adult` via the Back button, URL bar, or session restore.
 
-### 3.2 Test Coverage
+## 5. Testing
 
-- **Unit Tests**: Utility functions, Zustand store actions
-- **Integration Tests**: Component interactions
-- **E2E Tests**: Critical user journeys
-- **Visual Regression**: For 3D components
+Vitest + React Testing Library. Every store and component has a colocated `__tests__` file. Pure logic (`pulseScale`, `classifyEngagement`-style decision functions) is extracted so it can be tested with plain data, no DOM. There is no E2E test framework in this repo and no CI pipeline configured — `npm test` is run locally.
 
-## 4. Deployment Architecture
+## 6. Build
 
-### 4.1 Build Process
+Standard Vite build, `npm run build` outputs to `dist/`. `vite.config.js`'s `manualChunks` splits `react`/`three`/`utils` into separate bundles; the `three` chunk exceeds Rollup's default 500kB warning threshold (react-three-fiber + drei pull in a meaningful chunk of Three.js) — this is expected for a 3D-avatar app and not something this repo currently addresses with lazy-loading.
 
-```bash
-# Production Build
-$ npm run build
+## 7. What this app deliberately does not have
 
-# Outputs to:
-# - /dist (Vite output)
-# - /build (if using Create React App)
-```
+- No authentication, no accounts, no login — profiles are picked by tap, adults gated by a plain-string PIN comparison (a household speed bump, explicitly not a security boundary).
+- No backend, no database, no REST or WebSocket API.
+- No error-tracking service, no analytics, no monitoring.
+- No CI/CD pipeline.
 
-### 4.2 Environment Variables
-
-```env
-VITE_API_URL=https://api.broski.app
-VITE_FIREBASE_CONFIG={"apiKey": "..."}
-VITE_ENV=production
-```
-
-## 5. Error Handling
-
-### 5.1 Global Error Boundary
-
-```jsx
-// src/components/ErrorBoundary.jsx
-class ErrorBoundary extends React.Component {
-  state = { hasError: false, error: null };
-  
-  static getDerivedStateFromError(error) {
-    return { hasError: true, error };
-  }
-  
-  componentDidCatch(error, errorInfo) {
-    // Log to error tracking service
-    logErrorToService(error, errorInfo);
-  }
-  
-  render() {
-    if (this.state.hasError) {
-      return <ErrorFallback error={this.state.error} />;
-    }
-    return this.props.children;
-  }
-}
-```
-
-### 5.2 Monitoring Setup
-
-- **Frontend**: Sentry for error tracking
-- **Backend**: Log aggregation with ELK Stack
-- **Performance**: Web Vitals monitoring
-
-## 6. Security Considerations
-
-### 6.1 Frontend Security
-
-- Content Security Policy (CSP) headers
-- XSS protection via React's built-in escaping
-- CSRF protection for forms
-- Secure HTTP headers (helmet.js)
-
-### 6.2 Authentication
-
-- JWT token storage in httpOnly cookies
-- Token refresh mechanism
-- Rate limiting on authentication endpoints
-
-## 7. Performance Monitoring
-
-### 7.1 Key Metrics
-
-- **LCP (Largest Contentful Paint)**: < 2.5s
-- **FID (First Input Delay)**: < 100ms
-- **CLS (Cumulative Layout Shift)**: < 0.1
-- **3D FPS**: Maintain > 30fps on mid-range devices
-
-### 7.2 Monitoring Tools
-
-- **Web Vitals** for Core Web Vitals
-- **React DevTools** for component performance
-- **Three.js Stats** for 3D performance
-
-## 8. Future Improvements
-
-### 8.1 Code Splitting
-
-- Route-based code splitting
-- 3D asset lazy loading
-- Dynamic imports for heavy components
-
-### 8.2 Offline Support
-
-- Service Worker for PWA capabilities
-- IndexedDB for offline data storage
-- Background sync for task updates
-
-## 9. Development Workflow
-
-### 9.1 Git Strategy
-
-- Feature branches with `feature/` prefix
-- Conventional commits
-- PR reviews required
-- Semantic versioning
-
-### 9.2 CI/CD Pipeline
-
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy
-on: [push]
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-      - run: npm ci
-      - run: npm run build
-      - run: npm run test
-      - run: npm run deploy
-```
+These aren't omissions to fix — they're the point. See the design spec's Non-goals section.
