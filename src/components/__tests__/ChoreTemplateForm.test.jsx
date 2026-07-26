@@ -153,4 +153,18 @@ describe('ChoreTemplateForm', () => {
     rerender(<ChoreTemplateForm initialValues={null} onSubmit={() => {}} submitLabel="Save" onCancel={() => {}} />);
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
+
+  it('uses kidsOverride for the assignee list instead of the store, when provided', () => {
+    render(
+      <ChoreTemplateForm
+        initialValues={null}
+        onSubmit={() => {}}
+        submitLabel="Add chore"
+        kidsOverride={[{ id: 'draft-1', name: 'DraftKid' }]}
+      />
+    );
+
+    expect(screen.getByRole('option', { name: 'DraftKid' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Evan' })).not.toBeInTheDocument();
+  });
 });

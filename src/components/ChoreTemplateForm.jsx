@@ -31,10 +31,11 @@ function normalize(initialValues) {
   };
 }
 
-export default function ChoreTemplateForm({ initialValues, onSubmit, submitLabel, onCancel, idPrefix = 'chore' }) {
+export default function ChoreTemplateForm({ initialValues, onSubmit, submitLabel, onCancel, idPrefix = 'chore', kidsOverride }) {
   const [state, setState] = useState(() => normalize(initialValues));
   const [dayError, setDayError] = useState(false);
-  const kids = useProfileStore((s) => s.profiles.filter((p) => p.role === 'kid'));
+  const storeKids = useProfileStore((s) => s.profiles.filter((p) => p.role === 'kid'));
+  const kids = kidsOverride ?? storeKids;
 
   function toggleDay(day) {
     setState((prev) => ({
