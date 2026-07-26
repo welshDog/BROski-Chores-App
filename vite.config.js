@@ -42,8 +42,7 @@ export default defineConfig(({ mode }) => ({
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
           three: ['three', '@react-three/fiber', '@react-three/drei'],
-          ui: ['@shadcn/ui', 'lucide-react'],
-          utils: ['date-fns', 'zustand'],
+          utils: ['zustand'],
         },
       },
     },
