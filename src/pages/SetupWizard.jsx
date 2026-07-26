@@ -119,7 +119,7 @@ export default function SetupWizard() {
           <AvatarColorSwatches value={kidColor} onChange={setKidColor} />
           <button
             onClick={addDraftKid}
-            disabled={!kidName || !kidColor}
+            disabled={!kidName.trim() || !kidColor}
             className="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg hover:bg-purple-200 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Add kid
@@ -173,7 +173,7 @@ export default function SetupWizard() {
         </div>
         <button
           onClick={continueFromAdultName}
-          disabled={!adultName || !adultColor}
+          disabled={!adultName.trim() || !adultColor}
           className="bg-purple-600 text-white px-6 py-3 rounded-xl text-lg hover:bg-purple-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Continue
