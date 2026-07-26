@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import AdultDashboard from '../AdultDashboard';
@@ -110,7 +110,7 @@ describe('AdultDashboard', () => {
 
     const choresPanel = screen.getByRole('heading', { name: /^chores$/i }).closest('div');
     expect(within(choresPanel).getByText('Feed the dog')).toBeInTheDocument();
-    expect(screen.getByText(/inactive/i)).toBeInTheDocument();
+    expect(within(choresPanel).getByText(/inactive/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /reactivate/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^deactivate$/i })).not.toBeInTheDocument();
     const template = useChoreStore.getState().templates.find((t) => t.title === 'Feed the dog');
@@ -120,6 +120,15 @@ describe('AdultDashboard', () => {
   it("reactivating a template restores it to active and doesn't duplicate today's instance", () => {
     renderDashboard();
     fireEvent.click(screen.getByRole('button', { name: /deactivate/i }));
+
+    // Clear instances so reactivate's generateTodaysInstances() call has
+    // real work to do — otherwise the pre-existing instance from beforeEach
+    // would survive untouched and the count assertion below would pass even
+    // if regeneration were never called.
+    act(() => {
+      useChoreStore.setState({ instances: [] });
+    });
+
     fireEvent.click(screen.getByRole('button', { name: /reactivate/i }));
 
     const template = useChoreStore.getState().templates.find((t) => t.title === 'Feed the dog');

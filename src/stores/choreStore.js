@@ -57,6 +57,8 @@ export const useChoreStore = create(
             assignedTo: t.assignedTo,
             completedBy: null,
             status: 'open',
+            coinReward: t.coinReward,
+            xpReward: t.xpReward,
           }));
 
         if (newInstances.length > 0) {
@@ -89,7 +91,15 @@ export const useChoreStore = create(
           ),
         }));
 
-        return { profileId: instance.completedBy, coinReward: template.coinReward, xpReward: template.xpReward };
+        return {
+          profileId: instance.completedBy,
+          // Snapshot at generation time is the source of truth for what the
+          // kid was promised. Fall back to the (possibly since-edited)
+          // template only for instances persisted before this fix existed —
+          // this fallback is permanent, not a temporary migration shim.
+          coinReward: instance.coinReward ?? template.coinReward,
+          xpReward: instance.xpReward ?? template.xpReward,
+        };
       },
 
       decline: (instanceId) => {

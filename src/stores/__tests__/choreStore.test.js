@@ -115,6 +115,44 @@ describe('choreStore', () => {
     expect(useChoreStore.getState().instances.find((i) => i.id === instance.id).status).toBe('approved');
   });
 
+  it('approve resolves rewards from the instance snapshot, not the live (possibly edited) template', () => {
+    const template = useChoreStore.getState().addTemplate({
+      title: 'Feed the dog', coinReward: 10, xpReward: 5, assignedTo: 'anyone', schedule: { type: 'daily' },
+    });
+    useChoreStore.getState().generateTodaysInstances('2026-07-26', 'sun');
+    const instance = useChoreStore.getState().instancesForDate('2026-07-26')[0];
+    useChoreStore.getState().markDone(instance.id, 'evan-id');
+
+    // Adult edits the template's reward AFTER the kid already has a pending instance.
+    useChoreStore.getState().updateTemplate(template.id, { coinReward: 999, xpReward: 999 });
+
+    const result = useChoreStore.getState().approve(instance.id);
+
+    expect(result).toEqual({ profileId: 'evan-id', coinReward: 10, xpReward: 5 });
+  });
+
+  it('approve falls back to the template reward when the instance has no snapshot (pre-fix persisted data)', () => {
+    const template = useChoreStore.getState().addTemplate({
+      title: 'Feed the dog', coinReward: 10, xpReward: 5, assignedTo: 'anyone', schedule: { type: 'daily' },
+    });
+    // Construct an instance directly, bypassing generateTodaysInstances, to
+    // simulate an instance persisted to localStorage before this fix shipped
+    // (no coinReward/xpReward field at all).
+    const legacyInstance = {
+      id: 'legacy-instance-id',
+      templateId: template.id,
+      date: '2026-07-26',
+      assignedTo: 'anyone',
+      completedBy: 'evan-id',
+      status: 'pending',
+    };
+    useChoreStore.setState({ instances: [legacyInstance] });
+
+    const result = useChoreStore.getState().approve('legacy-instance-id');
+
+    expect(result).toEqual({ profileId: 'evan-id', coinReward: 10, xpReward: 5 });
+  });
+
   it('approve returns null for an instance that is not pending', () => {
     useChoreStore.getState().addTemplate({
       title: 'Feed the dog', coinReward: 10, xpReward: 5, assignedTo: 'anyone', schedule: { type: 'daily' },

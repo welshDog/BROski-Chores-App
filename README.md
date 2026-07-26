@@ -121,7 +121,6 @@ Reload the page and both profiles will appear on the picker.
 These are named, deliberate deferrals, not bugs:
 
 - **No in-app profile creation.** Households seed the first profiles via the browser console (above). An adult profile created with no PIN would be permanently un-enterable — always set one.
-- **Chore templates can only be added, not edited, deactivated, assigned to a specific person, or scheduled on specific weekdays** through the UI. That logic exists in `choreStore.js` and is fully tested — it just has no form wired to it yet.
 - No shared BROski$ economy integration — coins/XP are local to this app by design.
 
 ## Contributing
