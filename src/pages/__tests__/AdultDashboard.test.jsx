@@ -103,4 +103,68 @@ describe('AdultDashboard', () => {
     const instances = useChoreStore.getState().instancesForDate(today);
     expect(instances.some((i) => i.templateId === newTemplate.id)).toBe(true);
   });
+
+  it('deactivating a template shows it greyed out with a Reactivate option, still in the list', () => {
+    renderDashboard();
+    fireEvent.click(screen.getByRole('button', { name: /deactivate/i }));
+
+    const choresPanel = screen.getByRole('heading', { name: /^chores$/i }).closest('div');
+    expect(within(choresPanel).getByText('Feed the dog')).toBeInTheDocument();
+    expect(screen.getByText(/inactive/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /reactivate/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^deactivate$/i })).not.toBeInTheDocument();
+    const template = useChoreStore.getState().templates.find((t) => t.title === 'Feed the dog');
+    expect(template.active).toBe(false);
+  });
+
+  it("reactivating a template restores it to active and doesn't duplicate today's instance", () => {
+    renderDashboard();
+    fireEvent.click(screen.getByRole('button', { name: /deactivate/i }));
+    fireEvent.click(screen.getByRole('button', { name: /reactivate/i }));
+
+    const template = useChoreStore.getState().templates.find((t) => t.title === 'Feed the dog');
+    expect(template.active).toBe(true);
+
+    const today = new Date().toISOString().slice(0, 10);
+    const todaysInstancesForTemplate = useChoreStore
+      .getState()
+      .instancesForDate(today)
+      .filter((i) => i.templateId === template.id);
+    expect(todaysInstancesForTemplate).toHaveLength(1);
+  });
+
+  it('editing a template shows the edit form pre-filled with its current values', () => {
+    renderDashboard();
+    fireEvent.click(screen.getByRole('button', { name: /^edit$/i }));
+
+    const editForm = within(screen.getByTestId('chore-edit-form'));
+    expect(editForm.getByLabelText(/chore title/i).value).toBe('Feed the dog');
+    expect(editForm.getByLabelText(/coins/i).value).toBe('10');
+    expect(editForm.getByLabelText(/xp/i).value).toBe('5');
+  });
+
+  it('saving an edit updates the template, regenerates instances, and closes the editor', () => {
+    renderDashboard();
+    fireEvent.click(screen.getByRole('button', { name: /^edit$/i }));
+
+    const editForm = within(screen.getByTestId('chore-edit-form'));
+    fireEvent.change(editForm.getByLabelText(/chore title/i), { target: { value: 'Feed the dog daily' } });
+    fireEvent.click(editForm.getByRole('button', { name: /^save$/i }));
+
+    expect(useChoreStore.getState().templates.some((t) => t.title === 'Feed the dog daily')).toBe(true);
+    expect(screen.queryByTestId('chore-edit-form')).not.toBeInTheDocument();
+  });
+
+  it('cancelling an edit discards changes and does not call updateTemplate', () => {
+    renderDashboard();
+    fireEvent.click(screen.getByRole('button', { name: /^edit$/i }));
+
+    const editForm = within(screen.getByTestId('chore-edit-form'));
+    fireEvent.change(editForm.getByLabelText(/chore title/i), { target: { value: 'Should not save' } });
+    fireEvent.click(editForm.getByRole('button', { name: /cancel/i }));
+
+    expect(useChoreStore.getState().templates.some((t) => t.title === 'Should not save')).toBe(false);
+    expect(useChoreStore.getState().templates.some((t) => t.title === 'Feed the dog')).toBe(true);
+    expect(screen.queryByTestId('chore-edit-form')).not.toBeInTheDocument();
+  });
 });
