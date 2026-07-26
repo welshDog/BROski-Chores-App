@@ -94,7 +94,7 @@ npm install
 npm run dev
 ```
 
-The app opens at `http://localhost:3000`. No environment variables are needed — there's nothing to configure.
+The app opens at `http://localhost:5273`. No environment variables are needed — there's nothing to configure.
 
 ### Seeding your first profiles
 
