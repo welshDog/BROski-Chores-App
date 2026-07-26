@@ -73,7 +73,7 @@ export default function KidChoreBoard() {
                   <div>
                     <p className="font-medium text-gray-800">{template.title}</p>
                     <p className="text-sm text-gray-500">
-                      {template.coinReward} coins · {template.xpReward} XP
+                      {instance.coinReward ?? template.coinReward} coins · {instance.xpReward ?? template.xpReward} XP
                     </p>
                   </div>
                   {instance.status === 'pending' ? (

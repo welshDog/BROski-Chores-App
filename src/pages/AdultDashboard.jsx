@@ -99,7 +99,8 @@ export default function AdultDashboard() {
                 <li key={instance.id} className="bg-gray-50 rounded-lg p-4">
                   <p className="font-medium text-gray-800">{template.title}</p>
                   <p className="text-sm text-gray-500 mb-3">
-                    by {nameFor(instance.completedBy)} · {template.coinReward} coins · {template.xpReward} XP
+                    by {nameFor(instance.completedBy)} · {instance.coinReward ?? template.coinReward} coins ·{' '}
+                    {instance.xpReward ?? template.xpReward} XP
                   </p>
                   <div className="flex gap-2">
                     <button

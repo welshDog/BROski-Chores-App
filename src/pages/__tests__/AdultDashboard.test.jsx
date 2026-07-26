@@ -117,7 +117,7 @@ describe('AdultDashboard', () => {
     expect(template.active).toBe(false);
   });
 
-  it("reactivating a template restores it to active and doesn't duplicate today's instance", () => {
+  it('reactivating a template restores it to active and regenerates today\'s instance', () => {
     renderDashboard();
     fireEvent.click(screen.getByRole('button', { name: /deactivate/i }));
 
