@@ -45,7 +45,13 @@ describe('AdultDashboard', () => {
   it('redirects to / if no profile is selected', () => {
     useProfileStore.getState().clearCurrentProfile();
     renderDashboard();
-    expect(mockNavigate).toHaveBeenCalledWith('/');
+    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
+  });
+
+  it('redirects to / if the selected profile is a kid, not an adult', () => {
+    useProfileStore.getState().selectProfile(evanId); // evanId is the kid from beforeEach, has no pin
+    renderDashboard();
+    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
   });
 
   it('shows pending chores in the approval queue', () => {

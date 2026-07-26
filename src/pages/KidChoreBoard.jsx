@@ -44,7 +44,7 @@ export default function KidChoreBoard() {
         <button
           onClick={() => {
             clearCurrentProfile();
-            navigate('/');
+            navigate('/', { replace: true });
           }}
           className="text-sm text-gray-500 underline"
         >

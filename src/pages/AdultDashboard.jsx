@@ -23,11 +23,13 @@ export default function AdultDashboard() {
   const [coinReward, setCoinReward] = useState('');
   const [xpReward, setXpReward] = useState('');
 
-  useEffect(() => {
-    if (!currentProfileId) navigate('/');
-  }, [currentProfileId, navigate]);
+  const currentProfile = profiles.find((p) => p.id === currentProfileId);
 
-  if (!currentProfileId) return null;
+  useEffect(() => {
+    if (currentProfile?.role !== 'adult') navigate('/', { replace: true });
+  }, [currentProfile, navigate]);
+
+  if (currentProfile?.role !== 'adult') return null;
 
   const pending = instances.filter((i) => i.status === 'pending');
 
@@ -64,7 +66,7 @@ export default function AdultDashboard() {
         <button
           onClick={() => {
             clearCurrentProfile();
-            navigate('/');
+            navigate('/', { replace: true });
           }}
           className="text-sm text-gray-500 underline"
         >
