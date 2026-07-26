@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProfileStore } from '../stores/profileStore';
 import PinPad from '../components/PinPad';
+import SetupWizard from './SetupWizard';
 
 export default function ProfilePicker() {
   const navigate = useNavigate();
@@ -10,6 +11,8 @@ export default function ProfilePicker() {
   const verifyPin = useProfileStore((state) => state.verifyPin);
   const [pinTargetId, setPinTargetId] = useState(null);
   const [pinError, setPinError] = useState(false);
+
+  if (profiles.length === 0) return <SetupWizard />;
 
   function pickProfile(profile) {
     if (profile.role === 'kid') {

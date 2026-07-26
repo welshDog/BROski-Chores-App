@@ -74,4 +74,27 @@ describe('ProfilePicker', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(useProfileStore.getState().currentProfileId).toBeNull();
   });
+
+  it('after finishing the setup wizard from an empty household, the picker shows the new profiles', () => {
+    useProfileStore.setState({ profiles: [], currentProfileId: null });
+    renderPicker();
+
+    fireEvent.click(screen.getByRole('button', { name: /get started/i }));
+    fireEvent.change(screen.getByLabelText(/kid's name/i), { target: { value: 'Evan' } });
+    fireEvent.click(screen.getByRole('button', { name: '#FF6B6B' }));
+    fireEvent.click(screen.getByRole('button', { name: /^add kid$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+
+    fireEvent.change(screen.getByLabelText(/your name/i), { target: { value: 'Bro' } });
+    fireEvent.click(screen.getByRole('button', { name: '#4A90D9' }));
+    fireEvent.click(screen.getByRole('button', { name: /continue/i }));
+
+    for (const digit of '1234') fireEvent.click(screen.getByRole('button', { name: digit }));
+    for (const digit of '1234') fireEvent.click(screen.getByRole('button', { name: digit }));
+
+    fireEvent.click(screen.getByRole('button', { name: /skip for now/i }));
+
+    expect(screen.getByText('Evan')).toBeInTheDocument();
+    expect(screen.getByText('Bro')).toBeInTheDocument();
+  });
 });
