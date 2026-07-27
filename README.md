@@ -19,18 +19,26 @@ There is **no backend, no login system, no account creation**. Everything lives 
 
 ## Design history
 
-This app was rebuilt from scratch on 2026-07-26. The full reasoning — why one shared device instead of per-person logins, why chores are recurring templates instead of one-off tasks, why approval is required — is written up in:
+This app was rebuilt from scratch on 2026-07-26, then extended twice more the same week. Every version's full reasoning — why one shared device instead of per-person logins, why chores are recurring templates instead of one-off tasks, why approval is required — is written up in `docs/superpowers/`:
 
-- [`docs/superpowers/specs/2026-07-26-household-chores-v1-design.md`](docs/superpowers/specs/2026-07-26-household-chores-v1-design.md) — the design spec
-- [`docs/superpowers/plans/2026-07-26-household-chores-v1.md`](docs/superpowers/plans/2026-07-26-household-chores-v1.md) — the task-by-task implementation plan
+| | Spec (why) | Plan (how) |
+|---|---|---|
+| **v1** — core kiosk app | [`2026-07-26-household-chores-v1-design.md`](docs/superpowers/specs/2026-07-26-household-chores-v1-design.md) | [`2026-07-26-household-chores-v1.md`](docs/superpowers/plans/2026-07-26-household-chores-v1.md) |
+| **v1.1** — template edit/deactivate/reactivate | [`2026-07-26-chore-template-management-v1.1-design.md`](docs/superpowers/specs/2026-07-26-chore-template-management-v1.1-design.md) | [`2026-07-26-chore-template-management-v1.1.md`](docs/superpowers/plans/2026-07-26-chore-template-management-v1.1.md) |
+| **Setup Wizard** — first-run onboarding | [`2026-07-26-household-setup-wizard-design.md`](docs/superpowers/specs/2026-07-26-household-setup-wizard-design.md) | [`2026-07-26-household-setup-wizard.md`](docs/superpowers/plans/2026-07-26-household-setup-wizard.md) |
+
+Each shipped through the same cycle: design spec → implementation plan → fresh-subagent-per-task build → a whole-branch review that read the *entire* diff at once (not just each task in isolation) — and every single one of those whole-branch reviews caught at least one real, reachable bug that no individual task's review could have seen, because it only existed at the seam between two individually-correct pieces. All fixed and verified before merge; see each plan's own commit history for specifics.
 
 ## Features
+
+### First-run setup wizard
+On first launch, with no profiles yet, the app walks a household through adding its kids, one adult with a PIN (entered twice to confirm), and an optional first chore — no console needed.
 
 ### Profile picker
 A grid of avatar tiles. Kids tap through instantly; adults enter a PIN first.
 
-### Recurring chores
-Chores are defined once as templates (title, coin/XP reward, who it's for, how often) and the app generates today's instances automatically — daily, or on specific weekdays.
+### Recurring chores, fully manageable in-app
+Chores are defined as templates (title, coin/XP reward, who it's for, how often) and the app generates today's instances automatically — daily, or on specific weekdays. Templates can be added, edited, deactivated (stays visible, greyed out, reversible), and reactivated at any time from the Adult Dashboard, and assigned to a specific kid or left open to "Anyone." Editing a template never changes a chore a kid has already marked done or is waiting on approval for — the reward and assignee are locked in the moment that day's chore is generated, not resolved live from the template at payout time.
 
 ### Approval flow
 A kid marking a chore "Done" moves it to `pending`, not straight to `approved`. An adult reviews the queue and approves or declines. Declined chores go back to `open` — nothing is ever deleted.
@@ -59,20 +67,23 @@ No backend, no database, no auth service, no Firebase, no REST/WebSocket API. If
 ```text
 src/
 ├── stores/
-│   ├── profileStore.js     # profiles, coins/xp/level, PIN check, level-up flag
-│   ├── choreStore.js       # chore templates, daily instance generation, approval lifecycle
-│   └── uiStore.js          # generic notification/modal state
+│   ├── profileStore.js       # profiles, coins/xp/level, PIN check, level-up flag
+│   ├── choreStore.js         # chore templates, daily instance generation, approval lifecycle
+│   └── uiStore.js            # generic notification/modal state
 ├── pages/
-│   ├── ProfilePicker.jsx   # entry screen — profile grid + adult PIN gate
-│   ├── KidChoreBoard.jsx   # a kid's chores + their 3D avatar
-│   └── AdultDashboard.jsx  # approval queue + add-a-chore form
+│   ├── ProfilePicker.jsx     # entry screen — profile grid + adult PIN gate; shows SetupWizard when empty
+│   ├── SetupWizard.jsx       # first-run onboarding: kids, adult+PIN, optional first chore
+│   ├── KidChoreBoard.jsx     # a kid's chores + their 3D avatar
+│   └── AdultDashboard.jsx    # approval queue + chore template management (add/edit/deactivate/reactivate)
 ├── components/
-│   ├── PinPad.jsx          # numeric PIN entry
-│   └── 3D/Avatar.jsx       # the reward-payoff avatar, pulses on level-up
+│   ├── PinPad.jsx             # numeric PIN entry, reused for both verify and set-a-new-PIN
+│   ├── ChoreTemplateForm.jsx  # shared add/edit chore form, used by AdultDashboard and SetupWizard
+│   ├── AvatarColorSwatches.jsx # fixed 8-color avatar picker
+│   └── 3D/Avatar.jsx          # the reward-payoff avatar, pulses on level-up
 ├── lib/
-│   ├── storage.js          # small localStorage read/write helper
-│   └── avatarAnimation.js  # pure level-up pulse curve (no DOM/Three.js)
-├── App.jsx                 # routes + generates today's chore instances on mount
+│   ├── storage.js           # small localStorage read/write helper
+│   └── avatarAnimation.js   # pure level-up pulse curve (no DOM/Three.js)
+├── App.jsx                  # routes + generates today's chore instances on mount
 └── main.jsx
 ```
 
